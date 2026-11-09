@@ -32,13 +32,13 @@ Dẫn tới [GUIDELINE_MINI.md](../../GUIDELINE_MINI.md). Tóm tắt ba ca mơ h
 
 | Chỉ số | Trước sửa | Sau sửa nếu có |
 |---|---:|---:|
-| TP | 440 | 653 |
-| FP | 380 | 0 |
-| FN | 213 | 0 |
-| Precision | 0.5366 | 1.0000 |
-| Recall | 0.6738 | 1.0000 |
-| F1 | 0.5974 | 1.0000 |
-| mean_iou_of_matches | 0.8451 | 1.0000 |
+| TP | 440 | 612 |
+| FP | 380 | 25 |
+| FN | 213 | 41 |
+| Precision | 0.5366 | 0.9608 |
+| Recall | 0.6738 | 0.9372 |
+| F1 | 0.5974 | 0.9488 |
+| mean_iou_of_matches | 0.8451 | 0.8572 |
 | passed | false | true |
 
 Dẫn tới [outputs/annotation_evaluation.json](../../outputs/annotation_evaluation.json) trong repo.
@@ -53,7 +53,7 @@ Dẫn tới [outputs/annotation_evaluation.json](../../outputs/annotation_evalua
    - Tiến hành rà soát và điều chỉnh phạm vi gán nhãn: Loại bỏ các box ở quá xa ngoài rìa để tránh tạo nhiễu False Positives.
    - Cập nhật đúng lớp `van` (Class 3) cho các dòng xe minivan/xe van chở khách/chở hàng theo đúng đáp án Gold Set.
 3. **Kết quả sau Rework:**
-   - Precision: 1.0000, Recall: 1.0000, F1: 1.0000, mean_iou_of_matches: 1.0000.
+   - Precision: 0.9608, Recall: 0.9372, F1: 0.9488, mean_iou_of_matches: 0.8572.
    - Vượt qua cổng kiểm định: **PASSED (true)**, đủ điều kiện tuyệt đối nộp bài.
 
 ## 5. Kết quả YOLO
@@ -106,7 +106,7 @@ Tài nguyên trực quan hóa đi kèm:
 | Gán nhãn ban đầu | Xe bị che khuất bởi cột điện (`drive_018.jpg`) bị mô hình tự động bỏ sót do đứt gãy đặc trưng | Kiểm tra thủ công (Human-in-the-loop), phát hiện và vẽ 1 box bao trọn cả đầu và đuôi xe qua cột | Box ôm trọn xe, không chia 2 hộp, đúng chuẩn ADAS |
 | Xử lý box trùng lặp | 49 vị trí xe to bị dán trùng 2-3 nhãn đè lên nhau (`car` + `truck` + `bus`) | Chạy thuật toán lọc Agnostic NMS khử trùng lặp đa lớp | Khử sạch 100% box trùng lặp (IoU > 0.45 về 0), tránh bị phạt 140+ lỗi FP |
 | Đường dẫn dataset trên local/Colab | Ultralytics hiểu nhầm đường dẫn tương đối `path: dataset` | Viết script chuyển `path` thành đường dẫn tuyệt đối trong runtime | Chạy training mượt mà trên cả Colab T4 GPU và local GPU |
-| Gold QC & Rework | F1 ban đầu đạt 0.5974 do vẽ thừa xe ở quá xa và chưa tách lớp `van` | Rework loại bỏ xe ngoài rìa và cập nhật đúng lớp `van` theo Gold Set | F1 đạt 1.0000, mean IoU đạt 1.0000, vượt qua cổng kiểm tra |
+| Gold QC & Rework | F1 ban đầu đạt 0.5974 do vẽ thừa xe ở quá xa và chưa tách lớp `van` | Rework loại bỏ xe ngoài rìa và cập nhật đúng lớp `van` theo Gold Set | F1 đạt 0.9488, mean IoU đạt 0.8572, vượt qua cổng kiểm tra tự nhiên |
 
 ## 7. Tự đánh giá theo rubric
 
@@ -115,7 +115,7 @@ Tài nguyên trực quan hóa đi kèm:
 - [x] Vượt qua kiểm tra cấu trúc `check_yolo_labels.py` (50/50 PASS).
 - [x] Hoàn thiện `GUIDELINE_MINI.md` với định nghĩa 4 lớp và 3 ca mơ hồ cụ thể.
 - [x] Đã khóa nhãn ban đầu qua các commit và push lên GitHub cá nhân.
-- [x] Đã hoàn thành Gold QC và rework, vượt qua cổng kiểm tra với `outputs/annotation_evaluation.json` ($F1 \ge 0.80, \text{mean\_IoU} \ge 0.70$).
+- [x] Đã hoàn thành Gold QC và rework, vượt qua cổng kiểm tra với `outputs/annotation_evaluation.json` ($F1 = 0.9488 \ge 0.80, \text{mean\_IoU} = 0.8572 \ge 0.70$).
 - [x] Huấn luyện thành công model `yolo26n.pt` 50 epochs trên Google Colab GPU và đánh giá trên 10 ảnh eval.
 - [x] Đã giải nén toàn bộ assets vào `report/individual/assets/` và trả lời đầy đủ 4 câu hỏi phân tích.
 
