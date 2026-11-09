@@ -121,6 +121,6 @@ Tài nguyên trực quan hóa đi kèm:
 
 ## 8. Công cụ AI và tài liệu tham khảo
 
-- **Công cụ gán nhãn:** Sử dụng công cụ CVAT chạy cục bộ để thực hiện vẽ và gắn nhãn thủ công bằng tay toàn bộ 50 ảnh train theo các bước hướng dẫn trực tiếp trong buổi workshop.
-- **Sử dụng AI:** Sử dụng AI hỗ trợ rà soát câu chữ, định dạng bảng biểu và trình bày nội dung báo cáo cá nhân. Toàn bộ quá trình dán nhãn, các quyết định xử lý box và số liệu thực nghiệm do học viên tự thực hiện và tự chịu trách nhiệm.
-- **Tài liệu tham khảo:** Theo dõi và thực hành theo slide bài giảng, hướng dẫn trực tiếp của giảng viên và coach trong buổi workshop Day 02 (VinUni AI20k). Không sử dụng tài liệu ngoài.
+- **Công cụ gán nhãn:** Gán nhãn thủ công bằng tay 50 ảnh train trên công cụ CVAT theo hướng dẫn trong workshop.
+- **Sử dụng AI:** Hỗ trợ rà soát câu chữ, định dạng bảng biểu và trình bày nội dung báo cáo cá nhân. Tra cứu và giải thích các khái niệm lý thuyết (cơ chế tính IoU, Precision, Recall, F1-score, mAP50, mAP50–95, Bipartite matching); hỗ trợ giải thích cú pháp lệnh terminal trong môi trường Python và góp ý diễn đạt văn phong báo cáo. Toàn bộ nhãn dán và số liệu thực nghiệm do học viên tự thực hiện.
+- **Tài liệu tham khảo:** Theo dõi và thực hành theo slide bài giảng, hướng dẫn trực tiếp của giảng viên và coach trong buổi workshop.
