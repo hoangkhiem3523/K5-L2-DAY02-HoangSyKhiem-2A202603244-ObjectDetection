@@ -22,7 +22,7 @@ Dẫn tới [GUIDELINE_MINI.md](../../GUIDELINE_MINI.md). Tóm tắt ba ca mơ h
 - Kết quả checker và lỗi đã xử lý: `check_yolo_labels.py` ĐẠT cấu trúc 50/50 file nhãn hợp lệ, không có lỗi tọa độ hay vượt biên.
 - Danh sách ít nhất 10 ảnh đã rà bằng mắt: `drive_001`, `drive_002`, `drive_003`, `drive_005`, `drive_010`, `drive_015`, `drive_020`, `drive_025`, `drive_030`, `drive_050`.
 - Lỗi bỏ sót/box/class phát hiện khi rà và cách sửa: Phát hiện trường hợp hai xe sát nhau ở làn giữa dễ bị chồng lấn box quá sâu; đã tinh chỉnh lại ranh giới tiếp xúc giữa hai box để đảm bảo IoU chuẩn.
-- Commit khóa nhãn ban đầu: (Sẽ điền mã commit sau khi push bản ban đầu)
+- Commit khóa nhãn ban đầu: `1a13325` (https://github.com/hoangkhiem3523/K5-L2-DAY02-HoangSyKhiem-2A202603244-ObjectDetection/commit/1a13325)
 
 ## 4. Gold QC và rework
 
