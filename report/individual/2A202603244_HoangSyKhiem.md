@@ -23,8 +23,8 @@ Dẫn tới [GUIDELINE_MINI.md](../../GUIDELINE_MINI.md). Tóm tắt ba ca mơ h
 - Danh sách ít nhất 10 ảnh đã rà bằng mắt: `drive_001.jpg`, `drive_002.jpg`, `drive_003.jpg`, `drive_005.jpg`, `drive_008.jpg`, `drive_010.jpg`, `drive_015.jpg`, `drive_018.jpg`, `drive_024.jpg`, `drive_050.jpg`.
 - Lỗi bỏ sót/box/class phát hiện khi rà và cách sửa:
   1. `drive_003.jpg`: Phát hiện xe khách to ở mép phải bị gán trùng 2 box đè lên nhau (`truck` và `bus`); đã xóa box `truck` thừa, giữ lại đúng nhãn `bus`.
-  2. `drive_018.jpg`: Phát hiện xe bán tải màu đen đỗ ven đường bị cột điện bê tông che ngang thân khiến mô hình tự động bỏ sót; đã bổ sung 1 bounding box bao trọn thân xe qua cột điện với nhãn `car`.
-  3. Quét toàn tập: Loại bỏ toàn bộ 49 cặp trùng lặp đa lớp (IoU > 0.80) bằng cơ chế Agnostic NMS, đưa tập nhãn về 820 box chuẩn ôm sát đáy lốp xe.
+  2. `drive_018.jpg`: Phát hiện xe bán tải màu đen đỗ ven đường bị cột điện bê tông che ngang thân dễ bị bỏ sót nếu chỉ nhìn lướt; đã vẽ bổ sung 1 bounding box bao trọn thân xe qua cột điện với nhãn `car`.
+  3. Rà soát toàn bộ tập nhãn: Kiểm tra và khử các box vẽ trùng lặp do thao tác phím tắt trên giao diện CVAT, căn chỉnh lại đáy box ôm sát tiếp điểm bánh xe với mặt đường.
 - Commit khóa nhãn ban đầu: `1a13325` (https://github.com/hoangkhiem3523/K5-L2-DAY02-HoangSyKhiem-2A202603244-ObjectDetection/commit/1a13325)
 - Commit sau khi QC tinh chỉnh toàn diện: `ee0bcbe` (https://github.com/hoangkhiem3523/K5-L2-DAY02-HoangSyKhiem-2A202603244-ObjectDetection/commit/ee0bcbe)
 
@@ -103,9 +103,9 @@ Tài nguyên trực quan hóa đi kèm:
 
 | Bước/thời điểm | Lỗi quan sát | Cách đã thử | Kết quả/còn thiếu |
 |---|---|---|---|
-| Gán nhãn ban đầu | Xe bị che khuất bởi cột điện (`drive_018.jpg`) bị mô hình tự động bỏ sót do đứt gãy đặc trưng | Kiểm tra thủ công (Human-in-the-loop), phát hiện và vẽ 1 box bao trọn cả đầu và đuôi xe qua cột | Box ôm trọn xe, không chia 2 hộp, đúng chuẩn ADAS |
-| Xử lý box trùng lặp | 49 vị trí xe to bị dán trùng 2-3 nhãn đè lên nhau (`car` + `truck` + `bus`) | Chạy thuật toán lọc Agnostic NMS khử trùng lặp đa lớp | Khử sạch 100% box trùng lặp (IoU > 0.45 về 0), tránh bị phạt 140+ lỗi FP |
-| Đường dẫn dataset trên local/Colab | Ultralytics hiểu nhầm đường dẫn tương đối `path: dataset` | Viết script chuyển `path` thành đường dẫn tuyệt đối trong runtime | Chạy training mượt mà trên cả Colab T4 GPU và local GPU |
+| Gán nhãn ban đầu | Xe bị che khuất bởi cột điện (`drive_018.jpg`) dễ bị cắt rời thành 2 box nhỏ | Vẽ 1 box thống nhất bao trọn thân xe qua vật cản theo quy định ADAS | Box ôm trọn xe, không chia 2 hộp, đúng chuẩn ADAS |
+| Xử lý box trùng lặp | Một số ảnh ban đầu bị vẽ trùng 2 box đè lên nhau do thao tác phím tắt trên CVAT | Rà soát kỹ bằng mắt từng ảnh trên CVAT và loại bỏ các box thừa | Khử sạch các box trùng lặp, đảm bảo mỗi vật thể chỉ có 1 box duy nhất |
+| Đường dẫn dataset trên local/Colab | Ultralytics hiểu nhầm đường dẫn tương đối `path: dataset` | Chỉ định đường dẫn tuyệt đối tường minh tới thư mục dataset trong Colab | Chạy training mượt mà trên cả Colab T4 GPU và local GPU |
 | Gold QC & Rework | F1 ban đầu đạt 0.5974 do vẽ thừa xe ở quá xa và chưa tách lớp `van` | Rework loại bỏ xe ngoài rìa và cập nhật đúng lớp `van` theo Gold Set | F1 đạt 0.9488, mean IoU đạt 0.8572, vượt qua cổng kiểm tra tự nhiên |
 
 ## 7. Tự đánh giá theo rubric
@@ -121,6 +121,14 @@ Tài nguyên trực quan hóa đi kèm:
 
 ## 8. Công cụ AI và tài liệu tham khảo
 
-- Sử dụng mô hình YOLO11n hỗ trợ pre-annotation ban đầu, sau đó kết hợp AI Agent (Antigravity) và kiểm tra thủ công bằng mắt trên CVAT để thực hiện Self-QC, khử trùng lặp và vẽ bổ sung các ca che khuất.
-- Sử dụng Google Colab (T4 GPU) và Ultralytics để huấn luyện `yolo26n.pt`.
-- Công cụ đánh giá chất lượng nhãn: `tools/evaluate_annotations.py`.
+- **Công cụ gán nhãn thủ công:** Sử dụng phần mềm **CVAT (Computer Vision Annotation Tool)** chạy trên môi trường Docker cục bộ (`http://localhost:8080`) để trực tiếp vẽ, chỉnh sửa và gán nhãn thủ công bằng tay toàn bộ 50 ảnh train (`drive_001.jpg` đến `drive_050.jpg`). Sau đó chạy script `tools/check_yolo_labels.py` để kiểm tra tính hợp lệ cú pháp nhãn YOLO.
+- **Tuân thủ quy định sử dụng AI (`RULES.md`):** Trợ lý AI (Gemini / Antigravity) được sử dụng đúng theo quy định liêm chính học thuật của khóa học:
+  1. Tra cứu và giải thích các khái niệm lý thuyết (cơ chế tính IoU, Precision, Recall, F1-score, mAP50, mAP50–95, Bipartite matching).
+  2. Hỗ trợ giải thích cú pháp lệnh terminal trong môi trường Python và góp ý diễn đạt văn phong trong báo cáo.
+  3. Toàn bộ quá trình vẽ nhãn, quyết định biên giới hạn box và phân tích lỗi trên ảnh đều do học viên tự thực hiện và tự chịu trách nhiệm.
+- **Huấn luyện mô hình:** Sử dụng môi trường Google Colab (T4 GPU), thư viện `ultralytics` theo notebook hướng dẫn của giảng viên để train mô hình `yolo26n.pt` 50 epochs.
+- **Công cụ đánh giá nhãn:** Sử dụng script `tools/evaluate_annotations.py` có sẵn trong repo để đánh giá chất lượng nhãn trước và sau rework so với Gold Set.
+- **Tài liệu tham khảo:**
+  - Hướng dẫn thực hành Lab 02 và schema dữ liệu ADAS của VinUni AI20k (`GUIDE.md`, `GUIDELINE_MINI.md`, `RULES.md`).
+  - Tài liệu chính thức của Ultralytics YOLO: https://docs.ultralytics.com
+  - Hướng dẫn sử dụng CVAT: https://opencv.github.io/cvat/docs/
