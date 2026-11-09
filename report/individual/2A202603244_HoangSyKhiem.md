@@ -19,7 +19,7 @@ Dẫn tới [GUIDELINE_MINI.md](../../GUIDELINE_MINI.md). Tóm tắt ba ca mơ h
 ## 3. Annotation và self-QC
 
 - Số file nhãn train: 50/50 file (`drive_001.txt` đến `drive_050.txt`).
-- Kết quả checker và lỗi đã xử lý: Chạy `tools/check_yolo_labels.py` ĐẠT cấu trúc 50/50 file nhãn hợp lệ, tọa độ chuẩn hóa trong khoảng $[0, 1]$, không có file rỗng không hợp lệ.
+- Kết quả checker và lỗi đã xử lý: Chạy `tools/check_yolo_labels.py` ĐẠT cấu trúc 50/50 file nhãn hợp lệ, tọa độ chuẩn hóa trong khoảng [0, 1], không có file rỗng không hợp lệ.
 - Danh sách ít nhất 10 ảnh đã rà bằng mắt: `drive_001.jpg`, `drive_002.jpg`, `drive_003.jpg`, `drive_005.jpg`, `drive_008.jpg`, `drive_010.jpg`, `drive_015.jpg`, `drive_018.jpg`, `drive_024.jpg`, `drive_050.jpg`.
 - Lỗi bỏ sót/box/class phát hiện khi rà và cách sửa:
   1. `drive_003.jpg`: Phát hiện xe khách to ở mép phải bị gán trùng 2 box đè lên nhau (`truck` và `bus`); đã xóa box `truck` thừa, giữ lại đúng nhãn `bus`.
@@ -45,7 +45,7 @@ Dẫn tới [outputs/annotation_evaluation.json](../../outputs/annotation_evalua
 
 ### Ghi chép Rework cụ thể:
 1. **Phân tích lỗi trước khi sửa (F1 = 0.5974, mean_iou = 0.8451):**
-   - Độ ôm khít của các box đã ghép đạt rất cao ($\text{mean\_IoU} = 0.8451 > 0.70$), chứng tỏ kỹ thuật kéo box sát mép lốp xe của học viên rất tốt.
+   - Độ ôm khít của các box đã ghép đạt rất cao (mean_iou = 0.8451 > 0.70), chứng tỏ kỹ thuật kéo box sát mép lốp xe của học viên rất tốt.
    - Tuy nhiên, số lượng box vẽ thừa (FP = 380) và bỏ sót/sai loại (FN = 213) còn cao do sự chênh lệch về phạm vi gán nhãn so với quy chuẩn của Giảng viên:
      - **Nguyên nhân FP (Vẽ thừa):** Học viên ban đầu gán cả các xe ở rất xa trong bãi đỗ hoặc làn đường phụ đối diện (ví dụ: `drive_001.jpg` học viên vẽ 16 box, `drive_028.jpg` vẽ 12 box), trong khi Gold Set của giảng viên chỉ tập trung vào các xe chính trên làn đường lưu thông (Ego-lane và các làn kế cận có ảnh hưởng trực tiếp đến xe tự hành; `drive_001.jpg` Gold chỉ có 5 xe).
      - **Nguyên nhân FN (Sai lớp/Bỏ sót):** Trước khi nhận Gold, các xe minivan/MPV (như trên `drive_005.jpg`, `drive_024.jpg`, `drive_026.jpg`) bị gom nhãn thành `car`. Trong Gold Set, giảng viên tách riêng 54 xe này thành lớp `van` (Class 3).
@@ -77,15 +77,15 @@ Tài nguyên trực quan hóa đi kèm:
 ### Trả lời bốn câu hỏi cuối notebook:
 
 1. **Lớp nào có recall thấp nhất? Chỉ ra một ảnh eval minh họa:**
-   - Lớp có Recall thấp nhất là **`van` (Class 3) với $\text{Recall} = 0.0000$ (0.0%)**, tiếp theo là `truck` (39.0%) và `bus` (50.0%), trong khi `car` đạt Recall rất cao ($89.36\%$).
+   - Lớp có Recall thấp nhất là **`van` (Class 3) với Recall = 0.0000 (0.0%)**, tiếp theo là `truck` (39.0%) và `bus` (50.0%), trong khi `car` đạt Recall rất cao (89.36%).
    - Ảnh minh họa: **`drive_058.jpg`** (trong [assets/eval_predictions/visuals/drive_058.jpg](assets/eval_predictions/visuals/drive_058.jpg)). Trong ảnh này có một dãy xe van/minivan đỗ cạnh nhau (Ground Truth có 6 xe nhãn `van`), nhưng mô hình không phát hiện được hoặc nhận nhầm thành `car` do hiện tượng mất cân bằng dữ liệu (class imbalance) trầm trọng trong tập train chỉ có 50 ảnh.
 
 2. **Nếu mAP50 cao nhưng mAP50-95 thấp, cần kiểm điều gì trên box?**
-   - Hiện tượng $mAP_{50}$ cao nhưng $mAP_{50-95}$ thấp cho thấy mô hình đã phát hiện **đúng vị trí và phân loại đúng vật thể**, nhưng **độ ôm khít của Bounding Box (Localization Accuracy) chưa chuẩn**.
+   - Hiện tượng mAP50 cao nhưng mAP50-95 thấp cho thấy mô hình đã phát hiện **đúng vị trí và phân loại đúng vật thể**, nhưng **độ ôm khít của Bounding Box (Localization Accuracy) chưa chuẩn**.
    - Cần kiểm tra:
      - 4 cạnh của box có bị thừa nền đường hoặc lẹm vào thân xe hay không.
      - Đáy box có bị nuốt vào bóng đổ (shadow) của xe trên mặt đường thay vì dừng ở tiếp điểm lốp xe.
-     - Khi ngưỡng IoU tăng từ 0.50 lên 0.75, 0.85, 0.95, box chỉ cần lệch 3–5 pixel là IoU sẽ tụt xuống dưới ngưỡng và bị coi là False, kéo tụt $mAP_{50-95}$.
+     - Khi ngưỡng IoU tăng từ 0.50 lên 0.75, 0.85, 0.95, box chỉ cần lệch 3–5 pixel là IoU sẽ tụt xuống dưới ngưỡng và bị coi là False, kéo tụt mAP50-95.
 
 3. **Lỗi class nào có thể liên quan guideline? Dữ kiện nào hỗ trợ nhận xét?**
    - Lỗi nhầm lẫn giữa **`car` vs `van`** và **`car` vs `truck`** (đặc biệt là xe bán tải Pickup Truck và xe Minivan/MPV).
@@ -97,7 +97,7 @@ Tài nguyên trực quan hóa đi kèm:
    - **Vì sao không đưa vào train:** Tránh lỗi rò rỉ dữ liệu (**Data Leakage**). Mục tiêu của mô hình AI trong ADAS là khả năng tổng quát hóa trên dữ liệu chưa từng thấy ngoài đời thực. Nếu đem 10 ảnh eval vào train, mô hình sẽ học vẹt (overfit) và chỉ số đo được sẽ là "điểm ảo", không phản ánh đúng năng lực an toàn khi lái xe.
    - **Vai trò validation trong notebook:** 10 ảnh eval đóng vai trò tập kiểm định (Validation Set) độc lập trong quá trình huấn luyện:
      1. Theo dõi độ mất mát (`val/loss`) sau mỗi epoch để phát hiện sớm overfitting.
-     2. Dùng làm tiêu chí chọn trọng số tốt nhất (**`best.pt`**) tại epoch mà $mAP$ trên tập eval đạt đỉnh cao nhất.
+     2. Dùng làm tiêu chí chọn trọng số tốt nhất (**`best.pt`**) tại epoch mà mAP trên tập eval đạt đỉnh cao nhất.
 
 ## 6. Khó khăn và cách xử lý
 
@@ -115,7 +115,7 @@ Tài nguyên trực quan hóa đi kèm:
 - [x] Vượt qua kiểm tra cấu trúc `check_yolo_labels.py` (50/50 PASS).
 - [x] Hoàn thiện `GUIDELINE_MINI.md` với định nghĩa 4 lớp và 3 ca mơ hồ cụ thể.
 - [x] Đã khóa nhãn ban đầu qua các commit và push lên GitHub cá nhân.
-- [x] Đã hoàn thành Gold QC và rework, vượt qua cổng kiểm tra với `outputs/annotation_evaluation.json` ($F1 = 0.9488 \ge 0.80, \text{mean\_IoU} = 0.8572 \ge 0.70$).
+- [x] Đã hoàn thành Gold QC và rework, vượt qua cổng kiểm tra với `outputs/annotation_evaluation.json` (F1 = 0.9488 >= 0.80, mean_iou = 0.8572 >= 0.70).
 - [x] Huấn luyện thành công model `yolo26n.pt` 50 epochs trên Google Colab GPU và đánh giá trên 10 ảnh eval.
 - [x] Đã giải nén toàn bộ assets vào `report/individual/assets/` và trả lời đầy đủ 4 câu hỏi phân tích.
 
