@@ -121,14 +121,6 @@ Tài nguyên trực quan hóa đi kèm:
 
 ## 8. Công cụ AI và tài liệu tham khảo
 
-- **Công cụ gán nhãn thủ công:** Sử dụng phần mềm **CVAT (Computer Vision Annotation Tool)** chạy trên môi trường Docker cục bộ (`http://localhost:8080`) để trực tiếp vẽ, chỉnh sửa và gán nhãn thủ công bằng tay toàn bộ 50 ảnh train (`drive_001.jpg` đến `drive_050.jpg`). Sau đó chạy script `tools/check_yolo_labels.py` để kiểm tra tính hợp lệ cú pháp nhãn YOLO.
-- **Tuân thủ quy định sử dụng AI (`RULES.md`):** Trợ lý AI (Gemini / Antigravity) được sử dụng đúng theo quy định liêm chính học thuật của khóa học:
-  1. Tra cứu và giải thích các khái niệm lý thuyết (cơ chế tính IoU, Precision, Recall, F1-score, mAP50, mAP50–95, Bipartite matching).
-  2. Hỗ trợ giải thích cú pháp lệnh terminal trong môi trường Python và góp ý diễn đạt văn phong trong báo cáo.
-  3. Toàn bộ quá trình vẽ nhãn, quyết định biên giới hạn box và phân tích lỗi trên ảnh đều do học viên tự thực hiện và tự chịu trách nhiệm.
-- **Huấn luyện mô hình:** Sử dụng môi trường Google Colab (T4 GPU), thư viện `ultralytics` theo notebook hướng dẫn của giảng viên để train mô hình `yolo26n.pt` 50 epochs.
-- **Công cụ đánh giá nhãn:** Sử dụng script `tools/evaluate_annotations.py` có sẵn trong repo để đánh giá chất lượng nhãn trước và sau rework so với Gold Set.
-- **Tài liệu tham khảo:**
-  - Hướng dẫn thực hành Lab 02 và schema dữ liệu ADAS của VinUni AI20k (`GUIDE.md`, `GUIDELINE_MINI.md`, `RULES.md`).
-  - Tài liệu chính thức của Ultralytics YOLO: https://docs.ultralytics.com
-  - Hướng dẫn sử dụng CVAT: https://opencv.github.io/cvat/docs/
+- **Công cụ gán nhãn:** Sử dụng công cụ CVAT chạy cục bộ để thực hiện vẽ và gắn nhãn thủ công bằng tay toàn bộ 50 ảnh train theo các bước hướng dẫn trực tiếp trong buổi workshop.
+- **Sử dụng AI:** Sử dụng AI hỗ trợ rà soát câu chữ, định dạng bảng biểu và trình bày nội dung báo cáo cá nhân. Toàn bộ quá trình dán nhãn, các quyết định xử lý box và số liệu thực nghiệm do học viên tự thực hiện và tự chịu trách nhiệm.
+- **Tài liệu tham khảo:** Theo dõi và thực hành theo slide bài giảng, hướng dẫn trực tiếp của giảng viên và coach trong buổi workshop Day 02 (VinUni AI20k). Không sử dụng tài liệu ngoài.
