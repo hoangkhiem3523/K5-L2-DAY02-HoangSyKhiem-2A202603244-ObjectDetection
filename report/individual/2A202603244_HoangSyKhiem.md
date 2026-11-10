@@ -58,27 +58,27 @@ Dẫn tới [outputs/annotation_evaluation.json](../../outputs/annotation_evalua
 
 ## 5. Kết quả YOLO
 
-- Runtime, GPU/CPU, phiên bản Ultralytics và Torch: Google Colab T4 GPU, Python 3.11, Ultralytics 8.4.145, PyTorch 2.6.0+cu124.
+- Runtime, GPU/CPU, phiên bản Ultralytics và Torch: Huấn luyện trên mô hình YOLO26n với card đồ họa GPU, Python 3.11, Ultralytics 8.4.145, PyTorch 2.6.0+cu124.
 - Các tham số thay đổi so với notebook nếu có và lý do: Giữ nguyên mặc định theo notebook (`epochs=50`, `imgsz=640`, `seed=20260909`).
-- Đường dẫn best checkpoint trong phiên chạy: `/content/Day2-Lab/outputs/yolo26_runs/vehicle_annotation/weights/best.pt`
+- Đường dẫn best checkpoint trong phiên chạy: `outputs/yolo26_runs/vehicle_annotation/weights/best.pt`
 
 | Chỉ số trên 10 ảnh eval | Giá trị |
 |---|---:|
-| Precision | 0.5288 (52.88%) |
-| Recall | 0.4454 (44.54%) |
-| mAP50 | 0.3050 (30.50%) |
-| mAP50–95 | 0.2180 (21.80%) |
+| Precision | 0.4082 (40.82%) |
+| Recall | 0.5314 (53.14%) |
+| mAP50 | 0.4318 (43.18%) |
+| mAP50–95 | 0.2932 (29.32%) |
 
 Tài nguyên trực quan hóa đi kèm:
-- [outputs/eval_predictions/visuals/](../../outputs/eval_predictions/visuals/) hoặc [assets/eval_predictions/visuals/](assets/eval_predictions/visuals/)
+- [assets/eval_predictions/visuals/](assets/eval_predictions/visuals/)
 - [assets/yolo26_runs/vehicle_annotation/](assets/yolo26_runs/vehicle_annotation/)
 - [assets/yolo26_runs/vehicle_eval/](assets/yolo26_runs/vehicle_eval/)
 
 ### Trả lời bốn câu hỏi cuối notebook:
 
 1. **Lớp nào có recall thấp nhất? Chỉ ra một ảnh eval minh họa:**
-   - Lớp có Recall thấp nhất là **`van` (Class 3) với Recall = 0.0000 (0.0%)**, tiếp theo là `truck` (39.0%) và `bus` (50.0%), trong khi `car` đạt Recall rất cao (89.36%).
-   - Ảnh minh họa: **`drive_058.jpg`** (trong [assets/eval_predictions/visuals/drive_058.jpg](assets/eval_predictions/visuals/drive_058.jpg)). Trong ảnh này có một dãy xe van/minivan đỗ cạnh nhau (Ground Truth có 6 xe nhãn `van`), nhưng mô hình không phát hiện được hoặc nhận nhầm thành `car` do hiện tượng mất cân bằng dữ liệu (class imbalance) trầm trọng trong tập train chỉ có 50 ảnh.
+   - Lớp có Recall thấp nhất là **`truck` (Class 1) với Recall = 0.2000 (20.0%)**, mAP50 chỉ đạt 0.058 (5.8%), trong khi lớp `car` đạt Recall rất cao (0.926) và `van`, `bus` đạt 0.500.
+   - Ảnh minh họa: **`drive_053.jpg`** (trong [assets/eval_predictions/visuals/drive_053.jpg](assets/eval_predictions/visuals/drive_053.jpg)). Trong ground truth của ảnh này có 1 xe tải `truck` ở bên trái làn đường (tọa độ x~0.27, y~0.40), nhưng mô hình không nhận diện được xe tải mà bị nhầm sang lớp khác do trong 50 ảnh train số lượng xe tải quá ít (Class Imbalance).
 
 2. **Nếu mAP50 cao nhưng mAP50-95 thấp, cần kiểm điều gì trên box?**
    - Hiện tượng mAP50 cao nhưng mAP50-95 thấp cho thấy mô hình đã phát hiện **đúng vị trí và phân loại đúng vật thể**, nhưng **độ ôm khít của Bounding Box (Localization Accuracy) chưa chuẩn**.
@@ -91,7 +91,7 @@ Tài nguyên trực quan hóa đi kèm:
    - Lỗi nhầm lẫn giữa **`car` vs `van`** và **`car` vs `truck`** (đặc biệt là xe bán tải Pickup Truck và xe Minivan/MPV).
    - Dữ kiện hỗ trợ:
      - Trên tập train, xe bán tải có thùng hở thường bị nhầm sang `truck`, nhưng theo guideline đã quy định rõ phải gán về `car`.
-     - Các dòng xe 7–9 chỗ (Innova, Carnival, Starex) có thân hình hộp dài nhưng không đủ lớn như xe khách. Nếu guideline không nêu rõ tiêu chí phân biệt giữa xe cá nhân và xe chở khách/chở hàng, người gán nhãn rất dễ dán lúc là `car`, lúc là `van`, khiến mô hình học tín hiệu mâu thuẫn và Recall của `van` rơi về 0.
+     - Các dòng xe 7–9 chỗ (Innova, Carnival, Starex) có thân hình hộp dài nhưng không đủ lớn như xe khách. Nếu guideline không nêu rõ tiêu chí phân biệt giữa xe cá nhân và xe chở khách/chở hàng, người gán nhãn rất dễ dán lúc là `car`, lúc là `van`, khiến mô hình học tín hiệu mâu thuẫn. Nhờ bước Rework chuẩn hóa theo Gold Set, mô hình đã tách được `van` với mAP50 đạt 53.7%, tuy nhiên sự chênh lệch số lượng mẫu giữa `car` (hàng trăm box) và `van`/`truck` (dưới 20 box) vẫn là rào cản lớn nhất.
 
 4. **Vì sao không dùng 10 ảnh eval để train dù chúng có nhãn? Vai trò validation của chúng trong notebook là gì?**
    - **Vì sao không đưa vào train:** Tránh lỗi rò rỉ dữ liệu (**Data Leakage**). Mục tiêu của mô hình AI trong ADAS là khả năng tổng quát hóa trên dữ liệu chưa từng thấy ngoài đời thực. Nếu đem 10 ảnh eval vào train, mô hình sẽ học vẹt (overfit) và chỉ số đo được sẽ là "điểm ảo", không phản ánh đúng năng lực an toàn khi lái xe.
